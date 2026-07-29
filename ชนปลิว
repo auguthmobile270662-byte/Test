@@ -1,0 +1,59 @@
+-- โหลด Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- สร้างหน้าต่างหลัก (Window) ในธีมสีดำ
+local Window = Rayfield:CreateWindow({
+   Name = "JaRo",
+   LoadingTitle = "กำลังโหลดระบบ...",
+   LoadingSubtitle = "โดยเพื่อน",
+   Theme = "Default",
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+})
+
+-- สร้าง Tab
+local Tab = Window:CreateTab("Main", 4483362458)
+
+-- ตัวแปรควบคุมระบบ Fling
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+_G.FlingEnabled = false
+local connection = nil
+
+-- ฟังก์ชันเปิด/ปิดการชนให้ปลิว
+local function toggleFling(state)
+   _G.FlingEnabled = state
+   
+   if _G.FlingEnabled then
+      connection = RunService.Heartbeat:Connect(function()
+         local character = LocalPlayer.Character
+         if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+         local rootPart = character.HumanoidRootPart
+         
+         -- เพิ่มความเร็วในการหมุนและส่งแรงผลักเมื่อตัวละครสัมผัสกับผู้เล่นอื่น
+         local oldVelocity = rootPart.Velocity
+         rootPart.Velocity = oldVelocity * 10000 + Vector3.new(0, 10000, 0)
+         RunService.RenderStepped:Wait()
+         if rootPart and rootPart.Parent then
+            rootPart.Velocity = oldVelocity
+         end
+      end)
+   else
+      if connection then
+         connection:Disconnect()
+         connection = nil
+      end
+   end
+end
+
+-- สร้าง Toggle สำหรับเปิด-ปิดฟังก์ชัน
+local Toggle = Tab:CreateToggle({
+   Name = "เปิด/ปิด เดินชนคนอื่นปลิว",
+   CurrentValue = false,
+   Flag = "TouchFlingToggle",
+   Callback = function(Value)
+      toggleFling(Value)
+   end,
+})
