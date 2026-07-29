@@ -15,29 +15,38 @@ local Window = Rayfield:CreateWindow({
 -- สร้าง Tab
 local Tab = Window:CreateTab("Main", 4483362458)
 
--- ตัวแปรควบคุมระบบ Fling
+-- ตัวแปรควบคุมระบบ Push/Fling คนอื่น
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
-_G.FlingEnabled = false
+_G.PushEnabled = false
 local connection = nil
 
--- ฟังก์ชันเปิด/ปิดการชนให้ปลิว
-local function toggleFling(state)
-   _G.FlingEnabled = state
+-- ฟังก์ชันทำให้คนอื่นปลิวเวลาชน
+local function togglePush(state)
+   _G.PushEnabled = state
    
-   if _G.FlingEnabled then
-      connection = RunService.Heartbeat:Connect(function()
+   if _G.PushEnabled then
+      connection = RunService.Stepped:Connect(function()
          local character = LocalPlayer.Character
          if not character or not character:FindFirstChild("HumanoidRootPart") then return end
          local rootPart = character.HumanoidRootPart
          
-         -- เพิ่มความเร็วในการหมุนและส่งแรงผลักเมื่อตัวละครสัมผัสกับผู้เล่นอื่น
-         local oldVelocity = rootPart.Velocity
-         rootPart.Velocity = oldVelocity * 10000 + Vector3.new(0, 10000, 0)
-         RunService.RenderStepped:Wait()
-         if rootPart and rootPart.Parent then
-            rootPart.Velocity = oldVelocity
+         -- วนลูปเช็คผู้เล่นคนอื่นทั้งหมดในเกม
+         for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+               local targetRoot = player.Character.HumanoidRootPart
+               local targetHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
+               
+               -- คำนวณระยะห่างระหว่างเรากับผู้เล่นอื่น
+               local distance = (rootPart.Position - targetRoot.Position).Magnitude
+               
+               -- ถ้าเดินเข้าไปใกล้ (ชนกันในระยะ 4 เมตร) จะทำการส่งแรงผลักมหาศาลไปที่ตัวคนอื่น
+               if distance < 4 and targetHumanoid and targetHumanoid.Health > 0 then
+                  targetRoot.Velocity = Vector3.new(math.random(-500, 500), 1000, math.random(-500, 500))
+                  targetRoot.RotVelocity = Vector3.new(math.random(-1000, 1000), math.random(-1000, 1000), math.random(-1000, 1000))
+               end
+            end
          end
       end)
    else
@@ -50,10 +59,10 @@ end
 
 -- สร้าง Toggle สำหรับเปิด-ปิดฟังก์ชัน
 local Toggle = Tab:CreateToggle({
-   Name = "เปิด/ปิด เดินชนคนอื่นปลิว",
+   Name = "เปิด/ปิด เดินชนคนอื่นปลิว (เราไม่ปลิว)",
    CurrentValue = false,
-   Flag = "TouchFlingToggle",
+   Flag = "PushOtherToggle",
    Callback = function(Value)
-      toggleFling(Value)
+      togglePush(Value)
    end,
 })
