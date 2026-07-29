@@ -1,0 +1,142 @@
+-- สร้างหน้าจอ UI (ScreenGui)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JaRoCommandGUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false
+
+-- สร้างกรอบหลัก (Main Frame) สีดำ
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 320, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- มุมโค้งมน
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- กล่องข้อความ (TextBox) วางโค้ดที่นี่...
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0.9, 0, 0, 60)
+TextBox.Position = UDim2.new(0.05, 0, 0.05, 0)
+TextBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.PlaceholderText = "วางโค้ดที่นี่..."
+TextBox.Text = ""
+TextBox.TextSize = 14
+TextBox.Font = Enum.Font.SourceSansBold
+TextBox.ClearTextOnFocus = false
+TextBox.MultiLine = true
+TextBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.Parent = TextBox
+
+-- ฟังก์ชันสร้างปุ่มกด
+local function createButton(name, text, color, positionY)
+   local btn = Instance.new("TextButton")
+   btn.Name = name
+   btn.Size = UDim2.new(0.9, 0, 0, 45)
+   btn.Position = UDim2.new(0.05, 0, 0, positionY)
+   btn.BackgroundColor3 = color
+   btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+   btn.Text = text
+   btn.TextSize = 16
+   btn.Font = Enum.Font.SourceSansBold
+   btn.Parent = MainFrame
+
+   local btnCorner = Instance.new("UICorner")
+   btnCorner.CornerRadius = UDim.new(0, 6)
+   btnCorner.Parent = btn
+   
+   return btn
+end
+
+-- สร้างปุ่มทั้ง 5 ตามภาพ
+local Btn1 = createButton("Btn1", "1. คัดลอกโค้ด", Color3.fromRGB(0, 110, 255), 140)     -- สีฟ้า
+local Btn2 = createButton("Btn2", "2. รับโค้ด 1 ครั้ง", Color3.fromRGB(0, 160, 50), 195)   -- สีเขียว
+local Btn3 = createButton("Btn3", "3. บันทึกโค้ด", Color3.fromRGB(80, 80, 80), 250)       -- สีเทา
+local Btn4 = createButton("Btn4", "4. ประวัติบันทึก", Color3.fromRGB(120, 30, 180), 305) -- สีม่วง
+local Btn5 = createButton("Btn5", "5. รับรัวๆ: OFF", Color3.fromRGB(200, 30, 30), 360)   -- สีแดง
+
+-- ตัวแปรเก็บข้อมูลประวัติ
+local savedCodeHistory = ""
+local autoRunActive = false
+
+-- ฟังก์ชันปุ่มที่ 1: คัดลอกโค้ดในช่อง TextBox ไปยังคลิปบอร์ด
+Btn1.MouseButton1Click:Connect(function()
+   if setclipboard then
+      setclipboard(TextBox.Text)
+      Btn1.Text = "1. คัดลอกแล้ว!"
+      task.wait(1)
+      Btn1.Text = "1. คัดลอกโค้ด"
+   else
+      Btn1.Text = "1. Executor ไม่รองรับ!"
+      task.wait(1)
+      Btn1.Text = "1. คัดลอกโค้ด"
+   end
+end)
+
+-- ฟังก์ชันปุ่มที่ 2: รันโค้ดในช่อง TextBox ทันที 1 ครั้ง
+Btn2.MouseButton1Click:Connect(function()
+   local success, err = pcall(function()
+      local func = loadstring(TextBox.Text)
+      if func then
+         func()
+      end
+   end)
+   if success then
+      Btn2.Text = "2. รันสำเร็จ!"
+   else
+      Btn2.Text = "2. เกิดข้อผิดพลาด!"
+   end
+   task.wait(1)
+   Btn2.Text = "2. รับโค้ด 1 ครั้ง"
+end)
+
+-- ฟังก์ชันปุ่มที่ 3: บันทึกโค้ดปัจจุบันเก็บไว้ในตัวแปร
+Btn3.MouseButton1Click:Connect(function()
+   savedCodeHistory = TextBox.Text
+   Btn3.Text = "3. บันทึกแล้ว!"
+   task.wait(1)
+   Btn3.Text = "3. บันทึกโค้ด"
+end)
+
+-- ฟังก์ชันปุ่มที่ 4: ดึงโค้ดที่บันทึกไว้กลับมาใส่ในช่อง TextBox
+Btn4.MouseButton1Click:Connect(function()
+   if savedCodeHistory ~= "" then
+      TextBox.Text = savedCodeHistory
+      Btn4.Text = "4. โหลดข้อมูลแล้ว!"
+   else
+      Btn4.Text = "4. ไม่มีประวัติบันทึก!"
+   end
+   task.wait(1)
+   Btn4.Text = "4. ประวัติบันทึก"
+end)
+
+-- ฟังก์ชันปุ่มที่ 5: เปิด/ปิด การรันโค้ดแบบรัวๆ (Auto Execute)
+Btn5.MouseButton1Click:Connect(function()
+   autoRunActive = not autoRunActive
+   if autoRunActive then
+      Btn5.Text = "5. รับรัวๆ: ON"
+      Btn5.BackgroundColor3 = Color3.fromRGB(0, 180, 80) -- เปลี่ยนเป็นสีเขียวเมื่อเปิด
+      
+      task.spawn(function()
+         while autoRunActive do
+            pcall(function()
+               local func = loadstring(TextBox.Text)
+               if func then func() end
+            end)
+            task.wait(0.5) -- หน่วงเวลา 0.5 วินาทีต่อรอบ
+         end
+      end)
+   else
+      Btn5.Text = "5. รับรัวๆ: OFF"
+      Btn5.BackgroundColor3 = Color3.fromRGB(200, 30, 30) -- กลับเป็นสีแดงเมื่อปิด
+   end
+end)
