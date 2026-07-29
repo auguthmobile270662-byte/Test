@@ -1,0 +1,16 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Test", "DarkTheme")
+local Tab = Window:NewTab("Test")
+local Section = Tab:NewSection("Test")
+Section:NewToggle("WalkSpeed", "ToggleInfo", function(state)
+    if state then
+        print("Toggle On")
+game.player.LocalPlayer.Character.Humannoid.WalkSpeed = 100
+    else
+        print("Toggle Off")
+game.player.LocalPlayer.Character.Humannoid.WalkSpeed = 20
+    end
+end)
+Section:NewKeybind("KeybindText", "KeybindInfo", Enum.KeyCode.F, function()
+	print("You just clicked the bind")
+end)
