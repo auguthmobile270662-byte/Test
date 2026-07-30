@@ -1,0 +1,139 @@
+-- โหลด Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- สร้างหน้าต่างหลัก (Window) ในธีมสีดำ
+local Window = Rayfield:CreateWindow({
+   Name = "JaRo - Hub",
+   LoadingTitle = "กำลังโหลดระบบ...",
+   LoadingSubtitle = "โดยเพื่อน",
+   Theme = "Default",
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+   KeySystem = false,
+})
+
+-- สร้าง Tab ต่างๆ
+local MainTab = Window:CreateTab("ตัวละคร (Character)", 4483362458)
+local CombatTab = Window:CreateTab("ต่อสู้ (Combat)", 4483362458)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+-- ==================== ฟังก์ชันที่ 1: ความเร็วในการวิ่ง (WalkSpeed) ====================
+MainTab:CreateInput({
+   Name = "ความเร็วในการวิ่ง (WalkSpeed)",
+   PlaceholderText = "ใส่ตัวเลข เช่น 16, 50, 100",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      local speed = tonumber(Text)
+      if speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+         LocalPlayer.Character.Humanoid.WalkSpeed = speed
+      end
+   end,
+})
+
+-- ==================== ฟังก์ชันที่ 2: พลังในการกระโดด (JumpPower) ====================
+MainTab:CreateInput({
+   Name = "พลังกระโดดสูง (JumpPower)",
+   PlaceholderText = "ใส่ตัวเลข เช่น 50, 150, 300",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      local jump = tonumber(Text)
+      if jump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+         LocalPlayer.Character.Humanoid.UseJumpPower = true
+         LocalPlayer.Character.Humanoid.JumpPower = jump
+      end
+   end,
+})
+
+-- ==================== ฟังก์ชันที่ 3: เพิ่ม Hitbox (พร้อมสีฟ้าเปิดปิดได้) ====================
+local _G_HitboxEnabled = false
+local _G_HitboxSize = 15 -- ขนาดฮิตบ็อก
+local _G_HitboxColorToggle = true
+
+CombatTab:CreateToggle({
+   Name = "เปิด/ปิด ขยาย Hitbox คนอื่น",
+   CurrentValue = false,
+   Flag = "HitboxToggle",
+   Callback = function(Value)
+      _G_HitboxEnabled = Value
+   end,
+})
+
+CombatTab:CreateToggle({
+   Name = "เปิด/ปิด สีฟ้า Hitbox",
+   CurrentValue = true,
+   Flag = "HitboxColorToggle",
+   Callback = function(Value)
+      _G_HitboxColorToggle = Value
+   end,
+})
+
+-- ลูปทำงานขยายฮิตบ็อก
+RunService.RenderStepped:Connect(function()
+   if _G_HitboxEnabled then
+      for _, player in ipairs(Players:GetPlayers()) do
+         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = player.Character.HumanoidRootPart
+            hrp.Size = Vector3.new(_G_HitboxSize, _G_HitboxSize, _G_HitboxSize)
+            hrp.Transparency = _G_HitboxColorToggle and 0.6 or 1
+            if _G_HitboxColorToggle then
+               hrp.Color = Color3.fromRGB(0, 150, 255) -- สีฟ้า
+            end
+            hrp.CanCollide = false
+         end
+      end
+   end
+end)
+
+-- ==================== ฟังก์ชันที่ 4: Aimbot (ล็อคหัว / กระสุนเข้าหัวเมื่อยิง) ====================
+local _G_AimbotEnabled = false
+
+CombatTab:CreateToggle({
+   Name = "เปิด/ปิด Aimbot (ล็อกหัวเมื่อยิง)",
+   CurrentValue = false,
+   Flag = "AimbotToggle",
+   Callback = function(Value)
+      _G_AimbotEnabled = Value
+   end,
+})
+
+-- ฟังก์ชันตรวจจับและดึงเป้าเล็งไปที่หัวของศัตรูที่ใกล้ที่สุดเมื่อคลิกยิงหรือเล็ง
+RunService.RenderStepped:Connect(function()
+   if _G_AimbotEnabled then
+      local closestPlayer = nil
+      local shortestDistance = math.huge
+      
+      for _, player in ipairs(Players:GetPlayers()) do
+         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+               local head = player.Character.Head
+               local screenPoint, onScreen = Camera:WorldToScreenPoint(head.Position)
+               
+               if onScreen then
+                  local mouse = LocalPlayer:GetMouse()
+                  local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
+                  
+                  if distance < shortestDistance then
+                     shortestDistance = distance
+                     closestPlayer = player
+                  end
+               end
+            end
+         end
+      end
+      
+      -- ถ้าเจอเป้าหมายและทำการคลิกเมาส์ (จำลองการยิง) จะหันกล้องไปที่หัวทันที
+      if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+         local headPos = closestPlayer.Character.Head.Position
+         -- สามารถปรับให้ล็อคหน้าจอทันที หรือช่วยดึงมุมกล้องเข้าหาหัวเวลาโจมตี
+         if game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, headPos)
+         end
+      end
+   end
+end)
