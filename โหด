@@ -1,139 +1,183 @@
--- โหลด Rayfield UI Library
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- สร้างหน้าจอ UI หลัก (ScreenGui)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JaRoCustomGUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false
 
--- สร้างหน้าต่างหลัก (Window) ในธีมสีดำ
-local Window = Rayfield:CreateWindow({
-   Name = "JaRo - Hub",
-   LoadingTitle = "กำลังโหลดระบบ...",
-   LoadingSubtitle = "โดยเพื่อน",
-   Theme = "Default",
-   ConfigurationSaving = {
-      Enabled = false,
-   },
-   KeySystem = false,
-})
+-- ปุ่มเปิด/ปิด UI (Floating Button)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Text = "UI"
+ToggleBtn.TextSize = 18
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.Parent = ScreenGui
 
--- สร้าง Tab ต่างๆ
-local MainTab = Window:CreateTab("ตัวละคร (Character)", 4483362458)
-local CombatTab = Window:CreateTab("ต่อสู้ (Combat)", 4483362458)
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(0, 10)
+ToggleCorner.Parent = ToggleBtn
 
+-- หน้าต่างหลัก (Main Frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 260, 0, 310)
+MainFrame.Position = UDim2.new(0.5, -130, 0.5, -155)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true -- ทำให้สามารถลากเลื่อน UI ได้
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+-- หัวข้อหน้าต่าง (Title)
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.Text = "JaRo Hub - Menu"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.SourceSansBold
+Title.Parent = MainFrame
+
+-- ระบบเปิด-ปิดหน้าต่างหลักผ่านปุ่มลอย
+local isOpen = true
+ToggleBtn.MouseButton1Click:Connect(function()
+   isOpen = not isOpen
+   MainFrame.Visible = isOpen
+end)
+
+-- ฟังก์ชันสร้างปุ่มฟังก์ชันต่างๆ
+local function createMenuButton(name, text, positionY)
+   local btn = Instance.new("TextButton")
+   btn.Name = name
+   btn.Size = UDim2.new(0.9, 0, 0, 45)
+   btn.Position = UDim2.new(0.05, 0, 0, positionY)
+   btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+   btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+   btn.Text = text
+   btn.TextSize = 15
+   btn.Font = Enum.Font.SourceSansBold
+   btn.Parent = MainFrame
+
+   local btnCorner = Instance.new("UICorner")
+   btnCorner.CornerRadius = UDim.new(0, 8)
+   btnCorner.Parent = btn
+   
+   return btn
+end
+
+-- สร้างปุ่มฟังก์ชันทั้ง 3
+local BtnTp = createMenuButton("BtnTp", "1. คลิกเพื่อวาร์ป (Click TP): OFF", 55)
+local BtnAimbot = createMenuButton("BtnAimbot", "2. เอมบอทกระสุนล็อคเป้า: OFF", 110)
+local BtnWallhack = createMenuButton("BtnWallhack", "3. ทะลุกำแพง (Noclip): OFF", 165)
+
+-- ==================== ฟังก์ชันที่ 1: คลิกเพื่อวาร์ป ====================
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
+local UserInputService = game:GetService("UserInputService")
+local Mouse = LocalPlayer:GetMouse()
 
--- ==================== ฟังก์ชันที่ 1: ความเร็วในการวิ่ง (WalkSpeed) ====================
-MainTab:CreateInput({
-   Name = "ความเร็วในการวิ่ง (WalkSpeed)",
-   PlaceholderText = "ใส่ตัวเลข เช่น 16, 50, 100",
-   RemoveTextAfterFocusLost = false,
-   Callback = function(Text)
-      local speed = tonumber(Text)
-      if speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-         LocalPlayer.Character.Humanoid.WalkSpeed = speed
-      end
-   end,
-})
+local tpEnabled = false
+BtnTp.MouseButton1Click:Connect(function()
+   tpEnabled = not tpEnabled
+   if tpEnabled then
+      BtnTp.Text = "1. คลิกเพื่อวาร์ป (Click TP): ON"
+      BtnTp.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+   else
+      BtnTp.Text = "1. คลิกเพื่อวาร์ป (Click TP): OFF"
+      BtnTp.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+   end
+end)
 
--- ==================== ฟังก์ชันที่ 2: พลังในการกระโดด (JumpPower) ====================
-MainTab:CreateInput({
-   Name = "พลังกระโดดสูง (JumpPower)",
-   PlaceholderText = "ใส่ตัวเลข เช่น 50, 150, 300",
-   RemoveTextAfterFocusLost = false,
-   Callback = function(Text)
-      local jump = tonumber(Text)
-      if jump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-         LocalPlayer.Character.Humanoid.UseJumpPower = true
-         LocalPlayer.Character.Humanoid.JumpPower = jump
-      end
-   end,
-})
-
--- ==================== ฟังก์ชันที่ 3: เพิ่ม Hitbox (พร้อมสีฟ้าเปิดปิดได้) ====================
-local _G_HitboxEnabled = false
-local _G_HitboxSize = 15 -- ขนาดฮิตบ็อก
-local _G_HitboxColorToggle = true
-
-CombatTab:CreateToggle({
-   Name = "เปิด/ปิด ขยาย Hitbox คนอื่น",
-   CurrentValue = false,
-   Flag = "HitboxToggle",
-   Callback = function(Value)
-      _G_HitboxEnabled = Value
-   end,
-})
-
-CombatTab:CreateToggle({
-   Name = "เปิด/ปิด สีฟ้า Hitbox",
-   CurrentValue = true,
-   Flag = "HitboxColorToggle",
-   Callback = function(Value)
-      _G_HitboxColorToggle = Value
-   end,
-})
-
--- ลูปทำงานขยายฮิตบ็อก
-RunService.RenderStepped:Connect(function()
-   if _G_HitboxEnabled then
-      for _, player in ipairs(Players:GetPlayers()) do
-         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local hrp = player.Character.HumanoidRootPart
-            hrp.Size = Vector3.new(_G_HitboxSize, _G_HitboxSize, _G_HitboxSize)
-            hrp.Transparency = _G_HitboxColorToggle and 0.6 or 1
-            if _G_HitboxColorToggle then
-               hrp.Color = Color3.fromRGB(0, 150, 255) -- สีฟ้า
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+   if not gameProcessed and tpEnabled and input.UserInputType == Enum.UserInputType.MouseButton1 then
+      if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or true then -- กดคลิกธรรมดาหรือใช้งานร่วมกับ Ctrl
+         local char = LocalPlayer.Character
+         if char and char:FindFirstChild("HumanoidRootPart") then
+            if Mouse.Target then
+               char.HumanoidRootPart.CFrame = CFrame.new(Mouse.Hit.Position + Vector3.new(0, 3, 0))
             end
-            hrp.CanCollide = false
          end
       end
    end
 end)
 
--- ==================== ฟังก์ชันที่ 4: Aimbot (ล็อคหัว / กระสุนเข้าหัวเมื่อยิง) ====================
-local _G_AimbotEnabled = false
+-- ==================== ฟังก์ชันที่ 2: เอมบอทรemove กระสุนพุ่งหาเป้า ====================
+local aimbotEnabled = false
+BtnAimbot.MouseButton1Click:Connect(function()
+   aimbotEnabled = not aimbotEnabled
+   if aimbotEnabled then
+      BtnAimbot.Text = "2. เอมบอทกระสุนล็อคเป้า: ON"
+      BtnAimbot.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+   else
+      BtnAimbot.Text = "2. เอมบอทกระสุนล็อคเป้า: OFF"
+      BtnAimbot.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+   end
+end)
 
-CombatTab:CreateToggle({
-   Name = "เปิด/ปิด Aimbot (ล็อกหัวเมื่อยิง)",
-   CurrentValue = false,
-   Flag = "AimbotToggle",
-   Callback = function(Value)
-      _G_AimbotEnabled = Value
-   end,
-})
-
--- ฟังก์ชันตรวจจับและดึงเป้าเล็งไปที่หัวของศัตรูที่ใกล้ที่สุดเมื่อคลิกยิงหรือเล็ง
-RunService.RenderStepped:Connect(function()
-   if _G_AimbotEnabled then
+game:GetService("RunService").RenderStepped:Connect(function()
+   if aimbotEnabled then
+      local camera = workspace.CurrentCamera
       local closestPlayer = nil
       local shortestDistance = math.huge
       
+      -- หาผู้เล่นที่ใกล้เคียงที่สุดในจอ
       for _, player in ipairs(Players:GetPlayers()) do
          if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
             local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
             if humanoid and humanoid.Health > 0 then
-               local head = player.Character.Head
-               local screenPoint, onScreen = Camera:WorldToScreenPoint(head.Position)
-               
+               local headPos, onScreen = camera:WorldToViewportPoint(player.Character.Head.Position)
                if onScreen then
-                  local mouse = LocalPlayer:GetMouse()
-                  local distance = (Vector2.new(mouse.X, mouse.Y) - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
-                  
-                  if distance < shortestDistance then
-                     shortestDistance = distance
-                     closestPlayer = player
+                  local mousePos = Vector2.new(Mouse.X, Mouse.Y)
+                  local dist = (Vector2.new(headPos.X, headPos.Y) - mousePos).Magnitude
+                  if dist < shortestDistance then
+                     shortestDistance = dist
+                     closestPlayer = player.Character.Head
                   end
                end
             end
          end
       end
       
-      -- ถ้าเจอเป้าหมายและทำการคลิกเมาส์ (จำลองการยิง) จะหันกล้องไปที่หัวทันที
-      if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
-         local headPos = closestPlayer.Character.Head.Position
-         -- สามารถปรับให้ล็อคหน้าจอทันที หรือช่วยดึงมุมกล้องเข้าหาหัวเวลาโจมตี
-         if game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, headPos)
+      -- ล็อคมุมกล้องไปที่หัวเป้าหมายอย่างรวดเร็ว
+      if closestPlayer then
+         camera.CFrame = CFrame.new(camera.CFrame.Position, closestPlayer.Position)
+      end
+   end
+end)
+
+-- ==================== ฟังก์ชันที่ 3: ทะลุกำแพง (Noclip) ====================
+local noclipEnabled = false
+local noclipConnection = nil
+
+BtnWallhack.MouseButton1Click:Connect(function()
+   noclipEnabled = not noclipEnabled
+   if noclipEnabled then
+      BtnWallhack.Text = "3. ทะลุกำแพง (Noclip): ON"
+      BtnWallhack.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+      
+      noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+         local char = LocalPlayer.Character
+         if char then
+            for _, part in ipairs(char:GetDescendants()) do
+               if part:IsA("BasePart") then
+                  part.CanCollide = false
+               end
+            end
          end
+      end)
+   else
+      BtnWallhack.Text = "3. ทะลุกำแพง (Noclip): OFF"
+      BtnWallhack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+      if noclipConnection then
+         noclipConnection:Disconnect()
+         noclipConnection = nil
       end
    end
 end)
