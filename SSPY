@@ -1,6 +1,6 @@
 -- สร้างหน้าจอหลัก (ScreenGui)
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "JaRoRayfieldStyleGUI"
+ScreenGui.Name = "JaRoHorizontalGUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -9,7 +9,7 @@ local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleBtn"
 ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
 ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 ToggleBtn.TextColor3 = Color3.fromRGB(0, 150, 255)
 ToggleBtn.Text = "UI"
 ToggleBtn.TextSize = 18
@@ -20,28 +20,28 @@ local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- หน้าต่างหลักสไตล์ Rayfield (โทนสีดำ มนเล็กน้อย ลากเลื่อนได้)
+-- หน้าต่างหลัก (Main Frame) แบบแนวนอน
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 360, 0, 480)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
+MainFrame.Size = UDim2.new(0, 520, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -260, 0.5, -160)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
-MainFrame.Draggable = true -- เลื่อนหน้าจอ UI ได้
+MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
 
 local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- แถบหัวข้อด้านบน (Title Bar)
+-- แถบหัวข้อด้านบน
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Size = UDim2.new(1, 0, 0, 30)
 Title.BackgroundTransparency = 1
-Title.Text = "JaRo - Executor Menu"
+Title.Text = "JaRo - Horizontal Executor Menu"
 Title.TextColor3 = Color3.fromRGB(0, 170, 255)
-Title.TextSize = 16
+Title.TextSize = 15
 Title.Font = Enum.Font.Code
 Title.Parent = MainFrame
 
@@ -52,10 +52,10 @@ ToggleBtn.MouseButton1Click:Connect(function()
    MainFrame.Visible = isOpen
 end)
 
--- ช่องข้อความขนาดใหญ่ (TextBox) สำหรับใส่และแก้ไขโค้ด
+-- ================= ฝั่งซ้าย: กล่องข้อความ (TextBox) =================
 local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0.92, 0, 0, 130)
-TextBox.Position = UDim2.new(0.04, 0, 0, 45)
+TextBox.Size = UDim2.new(0, 280, 0, 260)
+TextBox.Position = UDim2.new(0, 15, 0, 40)
 TextBox.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 TextBox.TextColor3 = Color3.fromRGB(0, 190, 255)
 TextBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 80)
@@ -73,18 +73,28 @@ local BoxCorner = Instance.new("UICorner")
 BoxCorner.CornerRadius = UDim.new(0, 6)
 BoxCorner.Parent = TextBox
 
--- ฟังก์ชันสร้างปุ่มเมนูสไตล์ Rayfield (ฟอนต์คอมพิวเตอร์เหลี่ยม ตัวอักษรสีน้ำเงิน)
-local function createButton(name, text, positionY)
+-- ================= ฝั่งขวา: เมนูฟังก์ชัน (ScrollingFrame เลื่อนขึ้น-ลงได้) =================
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(0, 200, 0, 260)
+ScrollingFrame.Position = UDim2.new(0, 305, 0, 40)
+ScrollingFrame.BackgroundTransparency = 1
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 345) -- ขนาดความสูงรวมของปุ่มทั้งหมดเพื่อให้เลื่อนได้
+ScrollingFrame.ScrollBarThickness = 4
+ScrollingFrame.Parent = MainFrame
+
+-- ฟังก์ชันสร้างปุ่มใน ScrollingFrame
+local function createMenuButton(name, text, positionY)
    local btn = Instance.new("TextButton")
    btn.Name = name
-   btn.Size = UDim2.new(0.92, 0, 0, 45)
-   btn.Position = UDim2.new(0.04, 0, 0, positionY)
+   btn.Size = UDim2.new(1, -10, 0, 40)
+   btn.Position = UDim2.new(0, 0, 0, positionY)
    btn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
    btn.TextColor3 = Color3.fromRGB(0, 150, 255)
    btn.Text = text
-   btn.TextSize = 15
+   btn.TextSize = 13
    btn.Font = Enum.Font.Code
-   btn.Parent = MainFrame
+   btn.Parent = ScrollingFrame
 
    local btnCorner = Instance.new("UICorner")
    btnCorner.CornerRadius = UDim.new(0, 6)
@@ -93,72 +103,62 @@ local function createButton(name, text, positionY)
    return btn
 end
 
--- สร้างปุ่มฟังก์ชันทั้ง 5 ตามแบบในรูป
-local Btn1 = createButton("Btn1", "1. คัดลอกโค้ด", 185)
-local Btn2 = createButton("Btn2", "2. รับโค้ด 1 ครั้ง", 240)
-local Btn3 = createButton("Btn3", "3. บันทึกโค้ด", 295)
-local Btn4 = createButton("Btn4", "4. ประวัติบันทึก", 350)
-local Btn5 = createButton("Btn5", "5. รับรัวๆ: OFF", 405)
+-- สร้างปุ่มฟังก์ชันทางฝั่งขวาเรียงลงมา
+local BtnCopy = createMenuButton("BtnCopy", "1. คัดลอกโค้ด", 0)
+local BtnClear = createMenuButton("BtnClear", "2. เคลียร์โค้ด", 45)
+local BtnRunOnce = createMenuButton("BtnRunOnce", "3. รันโค้ด 1 ครั้ง", 90)
+local BtnRunAuto = createMenuButton("BtnRunAuto", "4. รัวๆ (0.1วิ): OFF", 135)
+local BtnSave = createMenuButton("BtnSave", "5. บันทึกโค้ด", 180)
+local BtnHistory1 = createMenuButton("BtnHistory1", "6. ประวัติบันทึก", 225)
+local BtnHistory2 = createMenuButton("BtnHistory2", "7. ประวัติบันทึกโค้ด", 270)
 
--- ตัวแปรระบบการทำงาน
+-- ================= ระบบการทำงานของปุ่มต่างๆ =================
 local savedCodeHistory = ""
 local autoRunActive = false
 
--- ปุ่มที่ 1: คัดลอกโค้ด
-Btn1.MouseButton1Click:Connect(function()
+-- 1. คัดลอกโค้ด
+BtnCopy.MouseButton1Click:Connect(function()
    if setclipboard then
       setclipboard(TextBox.Text)
-      Btn1.Text = "1. คัดลอกแล้ว!"
+      BtnCopy.Text = "คัดลอกแล้ว!"
       task.wait(1)
-      Btn1.Text = "1. คัดลอกโค้ด"
+      BtnCopy.Text = "1. คัดลอกโค้ด"
    else
-      Btn1.Text = "1. ไม่รองรับคลิปบอร์ด"
+      BtnCopy.Text = "ไม่รองรับคลิปบอร์ด"
       task.wait(1)
-      Btn1.Text = "1. คัดลอกโค้ด"
+      BtnCopy.Text = "1. คัดลอกโค้ด"
    end
 end)
 
--- ปุ่มที่ 2: รันโค้ด 1 ครั้ง
-Btn2.MouseButton1Click:Connect(function()
-   local success, err = pcall(function()
+-- 2. เคลียร์โค้ด (ลบข้อความทั้งหมดในกล่อง)
+BtnClear.MouseButton1Click:Connect(function()
+   TextBox.Text = ""
+   BtnClear.Text = "เคลียร์แล้ว!"
+   task.wait(1)
+   BtnClear.Text = "2. เคลียร์โค้ด"
+end)
+
+-- 3. รันโค้ด 1 ครั้ง
+BtnRunOnce.MouseButton1Click:Connect(function()
+   local success = pcall(function()
       local func = loadstring(TextBox.Text)
       if func then func() end
    end)
    if success then
-      Btn2.Text = "2. รันสำเร็จ!"
+      BtnRunOnce.Text = "รันสำเร็จ!"
    else
-      Btn2.Text = "2. เกิดข้อผิดพลาด!"
+      BtnRunOnce.Text = "เกิดข้อผิดพลาด!"
    end
    task.wait(1)
-   Btn2.Text = "2. รับโค้ด 1 ครั้ง"
+   BtnRunOnce.Text = "3. รันโค้ด 1 ครั้ง"
 end)
 
--- ปุ่มที่ 3: บันทึกโค้ด
-Btn3.MouseButton1Click:Connect(function()
-   savedCodeHistory = TextBox.Text
-   Btn3.Text = "3. บันทึกแล้ว!"
-   task.wait(1)
-   Btn3.Text = "3. บันทึกโค้ด"
-end)
-
--- ปุ่มที่ 4: ประวัติบันทึก (โหลดโค้ดที่เซฟไว้กลับมา)
-Btn4.MouseButton1Click:Connect(function()
-   if savedCodeHistory ~= "" then
-      TextBox.Text = savedCodeHistory
-      Btn4.Text = "4. โหลดข้อมูลแล้ว!"
-   else
-      Btn4.Text = "4. ไม่มีประวัติบันทึก!"
-   end
-   task.wait(1)
-   Btn4.Text = "4. ประวัติบันทึก"
-end)
-
--- ปุ่มที่ 5: รับรัวๆ (Auto Execute)
-Btn5.MouseButton1Click:Connect(function()
+-- 4. รันโค้ดรัวๆ (ความเร็ว 0.1 วิ)
+BtnRunAuto.MouseButton1Click:Connect(function()
    autoRunActive = not autoRunActive
    if autoRunActive then
-      Btn5.Text = "5. รับรัวๆ: ON"
-      Btn5.TextColor3 = Color3.fromRGB(0, 255, 100) -- เปลี่ยนเป็นสีเขียวเมื่อเปิดใช้งาน
+      BtnRunAuto.Text = "รัวๆ (0.1วิ): ON"
+      BtnRunAuto.TextColor3 = Color3.fromRGB(0, 255, 100)
       
       task.spawn(function()
          while autoRunActive do
@@ -166,11 +166,40 @@ Btn5.MouseButton1Click:Connect(function()
                local func = loadstring(TextBox.Text)
                if func then func() end
             end)
-            task.wait(0.3) -- หน่วงเวลา 0.1 วินาที
+            task.wait(0.1) -- ความเร็ว 0.1 วินาที
          end
       end)
    else
-      Btn5.Text = "5. รับรัวๆ: OFF"
-      Btn5.TextColor3 = Color3.fromRGB(0, 150, 255) -- กลับเป็นสีน้ำเงินตามธีม
+      BtnRunAuto.Text = "4. รัวๆ (0.1วิ): OFF"
+      BtnRunAuto.TextColor3 = Color3.fromRGB(0, 150, 255)
    end
+end)
+
+-- 5. บันทึกโค้ด
+BtnSave.MouseButton1Click:Connect(function()
+   savedCodeHistory = TextBox.Text
+   BtnSave.Text = "บันทึกแล้ว!"
+   task.wait(1)
+   BtnSave.Text = "5. บันทึกโค้ด"
+end)
+
+-- 6 & 7. ประวัติบันทึก / ประวัติบันทึกโค้ด (โหลดโค้ดที่เซฟไว้กลับมา)
+local function loadHistoryText()
+   if savedCodeHistory ~= "" then
+      TextBox.Text = savedCodeHistory
+   end
+end
+
+BtnHistory1.MouseButton1Click:Connect(function()
+   loadHistoryText()
+   BtnHistory1.Text = "โหลดแล้ว!"
+   task.wait(1)
+   BtnHistory1.Text = "6. ประวัติบันทึก"
+end)
+
+BtnHistory2.MouseButton1Click:Connect(function()
+   loadHistoryText()
+   BtnHistory2.Text = "โหลดแล้ว!"
+   task.wait(1)
+   BtnHistory2.Text = "7. ประวัติบันทึกโค้ด"
 end)
