@@ -4,13 +4,16 @@ ScreenGui.Name = "JaRoHorizontalGUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- ปุ่มเปิด/ปิด UI ลอยบนจอ
-local ToggleBtn = Instance.new("ImageButton")
+-- ปุ่มเปิด/ปิด UI ลอยบนจอ (ปรับแก้ให้ไม่ดำสนิทและเพิ่มข้อความ Jaro กำกับกันบัคภาพไม่ขึ้น)
+local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleBtn"
 ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
 ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-ToggleBtn.Image = "rbxassetid://0" -- [วิธีใช้] เปลี่ยนเลข 0 เป็น Asset ID รูปภาพของคุณ
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
+ToggleBtn.Text = "JaRo"
+ToggleBtn.TextSize = 12
+ToggleBtn.Font = Enum.Font.Code
 ToggleBtn.Parent = ScreenGui
 
 local ToggleCorner = Instance.new("UICorner")
@@ -76,7 +79,7 @@ ScrollingFrame.Size = UDim2.new(0, 215, 0, 300)
 ScrollingFrame.Position = UDim2.new(0, 330, 0, 45)
 ScrollingFrame.BackgroundTransparency = 1
 ScrollingFrame.BorderSizePixel = 0
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 480) -- ขยายพื้นที่รองรับเมนูใหม่
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 530) -- ขยายพื้นที่รองรับช่องกรอกตัวเลข
 ScrollingFrame.ScrollBarThickness = 4
 ScrollingFrame.Parent = MainFrame
 
@@ -84,7 +87,7 @@ ScrollingFrame.Parent = MainFrame
 local function createMenuButton(name, text, positionY)
    local btn = Instance.new("TextButton")
    btn.Name = name
-   btn.Size = UDim2.new(1, -10, 0, 40)
+   btn.Size = UDim2.new(1, -10, 0, 35)
    btn.Position = UDim2.new(0, 0, 0, positionY)
    btn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
    btn.TextColor3 = Color3.fromRGB(0, 150, 255)
@@ -108,26 +111,54 @@ local function createLabelHeader(text, positionY)
    lbl.BackgroundTransparency = 1
    lbl.Text = text
    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-   lbl.TextSize = 13
+   lbl.TextSize = 12
    lbl.Font = Enum.Font.Code
    lbl.TextXAlignment = Enum.TextXAlignment.Left
    lbl.Parent = ScrollingFrame
    return lbl
 end
 
+-- ฟังก์ชันสร้างช่องกรอกข้อความสำหรับใส่ตัวเลข
+local function createInputField(name, placeholder, positionY)
+   local input = Instance.new("TextBox")
+   input.Name = name
+   input.Size = UDim2.new(1, -10, 0, 35)
+   input.Position = UDim2.new(0, 0, 0, positionY)
+   input.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+   input.TextColor3 = Color3.fromRGB(0, 255, 150)
+   input.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+   input.PlaceholderText = placeholder
+   input.Text = ""
+   input.TextSize = 13
+   input.Font = Enum.Font.Code
+   input.Parent = ScrollingFrame
+
+   local corner = Instance.new("UICorner")
+   corner.CornerRadius = UDim.new(0, 6)
+   corner.Parent = input
+   
+   return input
+end
+
 -- สร้างปุ่มและหัวข้อตามลำดับ
 createLabelHeader("--- [ SSPY: ระบบโค้ด ] ---", 0)
 local BtnCopy = createMenuButton("BtnCopy", "1. คัดลอกโค้ด", 25)
-local BtnClear = createMenuButton("BtnClear", "2. เคลียร์โค้ด", 70)
-local BtnRunOnce = createMenuButton("BtnRunOnce", "3. รันโค้ด 1 ครั้ง", 115)
-local BtnRunAuto = createMenuButton("BtnRunAuto", "4. รัวๆ (0.1วิ): OFF", 160)
-local BtnSave = createMenuButton("BtnSave", "5. บันทึกโค้ด", 205)
-local BtnHistory1 = createMenuButton("BtnHistory1", "6. ประวัติบันทึก", 250)
-local BtnHistory2 = createMenuButton("BtnHistory2", "7. ประวัติบันทึกโค้ด", 295)
+local BtnClear = createMenuButton("BtnClear", "2. เคลียร์โค้ด", 65)
+local BtnRunOnce = createMenuButton("BtnRunOnce", "3. รันโค้ด 1 ครั้ง", 105)
+local BtnRunAuto = createMenuButton("BtnRunAuto", "4. รัวๆ (0.1วิ): OFF", 145)
+local BtnSave = createMenuButton("BtnSave", "5. บันทึกโค้ด", 185)
+local BtnHistory1 = createMenuButton("BtnHistory1", "6. ประวัติบันทึก", 225)
+local BtnHistory2 = createMenuButton("BtnHistory2", "7. ประวัติบันทึกโค้ด", 265)
 
-createLabelHeader("--- [ Player: ตั้งค่าตัวละคร ] ---", 345)
-local BtnSpeed = createMenuButton("BtnSpeed", "เพิ่มความเร็ว (Speed: 50)", 375)
-local BtnJump = createMenuButton("BtnJump", "เพิ่มพลังกระโดด (Jump: 100)", 420)
+createLabelHeader("--- [ Player: ตั้งค่าตัวละคร ] ---", 305)
+
+createLabelHeader("ความเร็ว (WalkSpeed):", 330)
+local SpeedInput = createInputField("SpeedInput", "ใส่ตัวเลขความเร็ว...", 355)
+local BtnSpeed = createMenuButton("BtnSpeed", "ตั้งค่าความเร็ว", 395)
+
+createLabelHeader("พลังกระโดด (JumpPower):", 435)
+local JumpInput = createInputField("JumpInput", "ใส่ตัวเลขกระโดด...", 460)
+local BtnJump = createMenuButton("BtnJump", "ตั้งค่ากระโดด", 500)
 
 -- ================= ระบบการทำงานของปุ่มต่างๆ =================
 local savedCodeHistory = ""
@@ -223,24 +254,40 @@ BtnHistory2.MouseButton1Click:Connect(function()
    BtnHistory2.Text = "7. ประวัติบันทึกโค้ด"
 end)
 
--- เพิ่มความเร็วเคลื่อนที่ (WalkSpeed)
+-- ตั้งค่าความเร็วตามที่พิมพ์ในช่อง
 BtnSpeed.MouseButton1Click:Connect(function()
-   local char = LocalPlayer.Character
-   if char and char:FindFirstChildOfClass("Humanoid") then
-      char:FindFirstChildOfClass("Humanoid").WalkSpeed = 50 -- สามารถเปลี่ยนเลขความเร็วตรงนี้ได้
-      BtnSpeed.Text = "ปรับความเร็ว (Speed: 50)"
+   local speedValue = tonumber(SpeedInput.Text)
+   if speedValue then
+      local char = LocalPlayer.Character
+      if char and char:FindFirstChildOfClass("Humanoid") then
+         char:FindFirstChildOfClass("Humanoid").WalkSpeed = speedValue
+         BtnSpeed.Text = "ตั้งค่าสำเร็จ!"
+         task.wait(1)
+         BtnSpeed.Text = "ตั้งค่าความเร็ว"
+      end
+   else
+      BtnSpeed.Text = "กรุณาใส่ตัวเลข!"
       task.wait(1)
+      BtnSpeed.Text = "ตั้งค่าความเร็ว"
    end
 end)
 
--- เพิ่มพลังในการกระโดด (JumpPower / JumpHeight)
+-- ตั้งค่าพลังกระโดดตามที่พิมพ์ในช่อง
 BtnJump.MouseButton1Click:Connect(function()
-   local char = LocalPlayer.Character
-   if char and char:FindFirstChildOfClass("Humanoid") then
-      local humanoid = char:FindFirstChildOfClass("Humanoid")
-      humanoid.UseJumpPower = true
-      humanoid.JumpPower = 100 -- สามารถเปลี่ยนเลขพลังกระโดดตรงนี้ได้
-      BtnJump.Text = "เพิ่มพลังกระโดด (Jump: 100)"
+   local jumpValue = tonumber(JumpInput.Text)
+   if jumpValue then
+      local char = LocalPlayer.Character
+      if char and char:FindFirstChildOfClass("Humanoid") then
+         local humanoid = char:FindFirstChildOfClass("Humanoid")
+         humanoid.UseJumpPower = true
+         humanoid.JumpPower = jumpValue
+         BtnJump.Text = "ตั้งค่าสำเร็จ!"
+         task.wait(1)
+         BtnJump.Text = "ตั้งค่ากระโดด"
+      end
+   else
+      BtnJump.Text = "กรุณาใส่ตัวเลข!"
       task.wait(1)
+      BtnJump.Text = "ตั้งค่ากระโดด"
    end
 end)
