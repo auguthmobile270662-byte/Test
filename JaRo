@@ -1,10 +1,10 @@
 -- สร้างหน้าจอหลัก (ScreenGui)
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "JaRoHorizontalGUI"
+ScreenGui.Name = "JaRoTabbedGUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- ปุ่มเปิด/ปิด UI ลอยบนจอ (ปรับแก้ให้ไม่ดำสนิทและเพิ่มข้อความ Jaro กำกับกันบัคภาพไม่ขึ้น)
+-- ปุ่มเปิด/ปิด UI ลอยบนจอ
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Name = "ToggleBtn"
 ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
@@ -20,11 +20,11 @@ local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0, 8)
 ToggleCorner.Parent = ToggleBtn
 
--- หน้าต่างหลัก (Main Frame) แบบแนวนอน
+-- หน้าต่างหลัก (Main Frame)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 560, 0, 360)
-MainFrame.Position = UDim2.new(0.5, -280, 0.5, -180)
+MainFrame.Size = UDim2.new(0, 580, 0, 360)
+MainFrame.Position = UDim2.new(0.5, -290, 0.5, -180)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -35,14 +35,16 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- แถบหัวข้อด้านบน (JaRo - Section - SSPY)
+-- แถบหัวข้อด้านบน
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "JaRo | Section: SSPY"
+Title.Text = "JaRo Hub | Menu System"
 Title.TextColor3 = Color3.fromRGB(0, 170, 255)
 Title.TextSize = 15
 Title.Font = Enum.Font.Code
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = MainFrame
 
 -- ระบบเปิด-ปิดหน้าต่าง UI
@@ -52,135 +54,218 @@ ToggleBtn.MouseButton1Click:Connect(function()
    MainFrame.Visible = isOpen
 end)
 
--- ================= ฝั่งซ้าย: กล่องข้อความ (TextBox) =================
+-- ================= แถบเมนูด้านซ้าย (Sidebar) =================
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 140, 0, 305)
+Sidebar.Position = UDim2.new(0, 15, 0, 40)
+Sidebar.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = MainFrame
+
+local SidebarCorner = Instance.new("UICorner")
+SidebarCorner.CornerRadius = UDim.new(0, 8)
+SidebarCorner.Parent = Sidebar
+
+-- ฟังก์ชันสร้างปุ่มเลือกแท็บฝั่งซ้าย
+local function createTabButton(name, text, positionY)
+   local btn = Instance.new("TextButton")
+   btn.Name = name
+   btn.Size = UDim2.new(1, -16, 0, 40)
+   btn.Position = UDim2.new(0, 8, 0, positionY)
+   btn.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+   btn.TextColor3 = Color3.fromRGB(0, 150, 255)
+   btn.Text = text
+   btn.TextSize = 13
+   btn.Font = Enum.Font.Code
+   btn.Parent = Sidebar
+
+   local corner = Instance.new("UICorner")
+   corner.CornerRadius = UDim.new(0, 6)
+   corner.Parent = btn
+   
+   return btn
+end
+
+local TabSSPY = createTabButton("TabSSPY", "SSPY", 10)
+local TabPlayer = createTabButton("TabPlayer", "Player", 60)
+
+-- ================= พื้นที่แสดงเนื้อหาด้านขวา (Container) =================
+local ContentContainer = Instance.new("Frame")
+ContentContainer.Size = UDim2.new(0, 395, 0, 305)
+ContentContainer.Position = UDim2.new(0, 165, 0, 40)
+ContentContainer.BackgroundTransparency = 1
+ContentContainer.Parent = MainFrame
+
+-- หน้าที่ 1: SSPY (แบ่งครึ่งซ้าย-ขวา ข้างใน SSPY คือ กล่องโค้ด + ปุ่มฟังก์ชันโค้ด)
+local SSPYPage = Instance.new("Frame")
+SSPYPage.Size = UDim2.new(1, 0, 1, 0)
+SSPYPage.BackgroundTransparency = 1
+SSPYPage.Visible = true
+SSPYPage.Parent = ContentContainer
+
+-- กล่องข้อความ (TextBox) ใน SSPY
 local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0, 300, 0, 300)
-TextBox.Position = UDim2.new(0, 15, 0, 45)
+TextBox.Size = UDim2.new(0, 210, 0, 295)
+TextBox.Position = UDim2.new(0, 0, 0, 5)
 TextBox.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 TextBox.TextColor3 = Color3.fromRGB(0, 190, 255)
 TextBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 80)
 TextBox.PlaceholderText = "วางโค้ดที่นี่..."
 TextBox.Text = ""
-TextBox.TextSize = 13
+TextBox.TextSize = 12
 TextBox.Font = Enum.Font.Code
 TextBox.ClearTextOnFocus = false
 TextBox.MultiLine = true
 TextBox.TextXAlignment = Enum.TextXAlignment.Left
 TextBox.TextYAlignment = Enum.TextYAlignment.Top
-TextBox.Parent = MainFrame
+TextBox.Parent = SSPYPage
 
 local BoxCorner = Instance.new("UICorner")
 BoxCorner.CornerRadius = UDim.new(0, 6)
 BoxCorner.Parent = TextBox
 
--- ================= ฝั่งขวา: เมนูฟังก์ชัน (ScrollingFrame เลื่อนขึ้น-ลงได้) =================
-local ScrollingFrame = Instance.new("ScrollingFrame")
-ScrollingFrame.Size = UDim2.new(0, 215, 0, 300)
-ScrollingFrame.Position = UDim2.new(0, 330, 0, 45)
-ScrollingFrame.BackgroundTransparency = 1
-ScrollingFrame.BorderSizePixel = 0
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 530) -- ขยายพื้นที่รองรับช่องกรอกตัวเลข
-ScrollingFrame.ScrollBarThickness = 4
-ScrollingFrame.Parent = MainFrame
+-- เมนูปุ่มฟังก์ชัน SSPY (ScrollingFrame ฝั่งขวาของหน้า SSPY)
+local SSPYScroll = Instance.new("ScrollingFrame")
+SSPYScroll.Size = UDim2.new(0, 170, 0, 295)
+SSPYScroll.Position = UDim2.new(0, 225, 0, 5)
+SSPYScroll.BackgroundTransparency = 1
+SSPYScroll.BorderSizePixel = 0
+SSPYScroll.CanvasSize = UDim2.new(0, 0, 0, 310)
+SSPYScroll.ScrollBarThickness = 3
+SSPYScroll.Parent = SSPYPage
 
--- ฟังก์ชันสร้างปุ่มใน ScrollingFrame
-local function createMenuButton(name, text, positionY)
+local function createSSPYButton(text, positionY)
    local btn = Instance.new("TextButton")
-   btn.Name = name
-   btn.Size = UDim2.new(1, -10, 0, 35)
+   btn.Size = UDim2.new(1, -5, 0, 38)
    btn.Position = UDim2.new(0, 0, 0, positionY)
    btn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
    btn.TextColor3 = Color3.fromRGB(0, 150, 255)
    btn.Text = text
-   btn.TextSize = 13
+   btn.TextSize = 12
    btn.Font = Enum.Font.Code
-   btn.Parent = ScrollingFrame
+   btn.Parent = SSPYScroll
 
-   local btnCorner = Instance.new("UICorner")
-   btnCorner.CornerRadius = UDim.new(0, 6)
-   btnCorner.Parent = btn
-   
+   local corner = Instance.new("UICorner")
+   corner.CornerRadius = UDim.new(0, 6)
+   corner.Parent = btn
    return btn
 end
 
--- ฟังก์ชันสร้างหัวข้อหมวดหมู่
-local function createLabelHeader(text, positionY)
+local BtnCopy = createSSPYButton("1. คัดลอกโค้ด", 0)
+local BtnClear = createSSPYButton("2. เคลียร์โค้ด", 44)
+local BtnRunOnce = createSSPYButton("3. รัน 1 ครั้ง", 88)
+local BtnRunAuto = createSSPYButton("4. รัวๆ(0.1s): OFF", 132)
+local BtnSave = createSSPYButton("5. บันทึกโค้ด", 176)
+local BtnHistory1 = createSSPYButton("6. ประวัติบันทึก", 220)
+local BtnHistory2 = createSSPYButton("7. ประวัติสำรอง", 264)
+
+
+-- หน้าที่ 2: Player (ตั้งค่าความเร็วและกระโดด)
+local PlayerPage = Instance.new("ScrollingFrame")
+PlayerPage.Size = UDim2.new(1, 0, 1, 0)
+PlayerPage.Position = UDim2.new(0, 0, 0, 5)
+PlayerPage.BackgroundTransparency = 1
+PlayerPage.BorderSizePixel = 0
+PlayerPage.CanvasSize = UDim2.new(0, 0, 0, 220)
+PlayerPage.ScrollBarThickness = 3
+PlayerPage.Visible = false
+PlayerPage.Parent = ContentContainer
+
+local function createPlayerLabel(text, positionY)
    local lbl = Instance.new("TextLabel")
    lbl.Size = UDim2.new(1, -10, 0, 25)
-   lbl.Position = UDim2.new(0, 0, 0, positionY)
+   lbl.Position = UDim2.new(0, 5, 0, positionY)
    lbl.BackgroundTransparency = 1
    lbl.Text = text
    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-   lbl.TextSize = 12
+   lbl.TextSize = 13
    lbl.Font = Enum.Font.Code
    lbl.TextXAlignment = Enum.TextXAlignment.Left
-   lbl.Parent = ScrollingFrame
+   lbl.Parent = PlayerPage
    return lbl
 end
 
--- ฟังก์ชันสร้างช่องกรอกข้อความสำหรับใส่ตัวเลข
-local function createInputField(name, placeholder, positionY)
+local function createPlayerInput(name, placeholder, positionY)
    local input = Instance.new("TextBox")
    input.Name = name
    input.Size = UDim2.new(1, -10, 0, 35)
-   input.Position = UDim2.new(0, 0, 0, positionY)
-   input.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+   input.Position = UDim2.new(0, 5, 0, positionY)
+   input.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
    input.TextColor3 = Color3.fromRGB(0, 255, 150)
    input.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
    input.PlaceholderText = placeholder
    input.Text = ""
    input.TextSize = 13
    input.Font = Enum.Font.Code
-   input.Parent = ScrollingFrame
+   input.Parent = PlayerPage
 
    local corner = Instance.new("UICorner")
    corner.CornerRadius = UDim.new(0, 6)
    corner.Parent = input
-   
    return input
 end
 
--- สร้างปุ่มและหัวข้อตามลำดับ
-createLabelHeader("--- [ SSPY: ระบบโค้ด ] ---", 0)
-local BtnCopy = createMenuButton("BtnCopy", "1. คัดลอกโค้ด", 25)
-local BtnClear = createMenuButton("BtnClear", "2. เคลียร์โค้ด", 65)
-local BtnRunOnce = createMenuButton("BtnRunOnce", "3. รันโค้ด 1 ครั้ง", 105)
-local BtnRunAuto = createMenuButton("BtnRunAuto", "4. รัวๆ (0.1วิ): OFF", 145)
-local BtnSave = createMenuButton("BtnSave", "5. บันทึกโค้ด", 185)
-local BtnHistory1 = createMenuButton("BtnHistory1", "6. ประวัติบันทึก", 225)
-local BtnHistory2 = createMenuButton("BtnHistory2", "7. ประวัติบันทึกโค้ด", 265)
+local function createPlayerButton(name, text, positionY)
+   local btn = Instance.new("TextButton")
+   btn.Name = name
+   btn.Size = UDim2.new(1, -10, 0, 38)
+   btn.Position = UDim2.new(0, 5, 0, positionY)
+   btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+   btn.TextColor3 = Color3.fromRGB(0, 150, 255)
+   btn.Text = text
+   btn.TextSize = 13
+   btn.Font = Enum.Font.Code
+   btn.Parent = PlayerPage
 
-createLabelHeader("--- [ Player: ตั้งค่าตัวละคร ] ---", 305)
+   local corner = Instance.new("UICorner")
+   corner.CornerRadius = UDim.new(0, 6)
+   corner.Parent = btn
+   return btn
+end
 
-createLabelHeader("ความเร็ว (WalkSpeed):", 330)
-local SpeedInput = createInputField("SpeedInput", "ใส่ตัวเลขความเร็ว...", 355)
-local BtnSpeed = createMenuButton("BtnSpeed", "ตั้งค่าความเร็ว", 395)
+createPlayerLabel("ความเร็วเคลื่อนที่ (WalkSpeed):", 5)
+local SpeedInput = createPlayerInput("SpeedInput", "ใส่ตัวเลขความเร็ว...", 30)
+local BtnSpeed = createPlayerButton("BtnSpeed", "ตั้งค่าความเร็ว", 70)
 
-createLabelHeader("พลังกระโดด (JumpPower):", 435)
-local JumpInput = createInputField("JumpInput", "ใส่ตัวเลขกระโดด...", 460)
-local BtnJump = createMenuButton("BtnJump", "ตั้งค่ากระโดด", 500)
+createPlayerLabel("พลังกระโดด (JumpPower):", 115)
+local JumpInput = createPlayerInput("JumpInput", "ใส่ตัวเลขกระโดด...", 140)
+local BtnJump = createPlayerButton("BtnJump", "ตั้งค่ากระโดด", 180)
 
--- ================= ระบบการทำงานของปุ่มต่างๆ =================
+
+-- ================= ระบบสลับหน้าแท็บ (Tab Switching) =================
+TabSSPY.MouseButton1Click:Connect(function()
+   SSPYPage.Visible = true
+   PlayerPage.Visible = false
+   TabSSPY.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+   TabPlayer.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+end)
+
+TabPlayer.MouseButton1Click:Connect(function()
+   SSPYPage.Visible = false
+   PlayerPage.Visible = true
+   TabPlayer.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+   TabSSPY.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+end)
+
+-- ตั้งค่าสีเริ่มต้นแท็บ SSPY ให้เด่นขึ้น
+TabSSPY.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+
+
+-- ================= ฟังก์ชันการทำงานต่างๆ =================
 local savedCodeHistory = ""
 local autoRunActive = false
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- 1. คัดลอกโค้ด
 BtnCopy.MouseButton1Click:Connect(function()
    if setclipboard then
       setclipboard(TextBox.Text)
       BtnCopy.Text = "คัดลอกแล้ว!"
       task.wait(1)
       BtnCopy.Text = "1. คัดลอกโค้ด"
-   else
-      BtnCopy.Text = "ไม่รองรับคลิปบอร์ด"
-      task.wait(1)
-      BtnCopy.Text = "1. คัดลอกโค้ด"
    end
 end)
 
--- 2. เคลียร์โค้ด
 BtnClear.MouseButton1Click:Connect(function()
    TextBox.Text = ""
    BtnClear.Text = "เคลียร์แล้ว!"
@@ -188,7 +273,6 @@ BtnClear.MouseButton1Click:Connect(function()
    BtnClear.Text = "2. เคลียร์โค้ด"
 end)
 
--- 3. รันโค้ด 1 ครั้ง
 BtnRunOnce.MouseButton1Click:Connect(function()
    local success = pcall(function()
       local func = loadstring(TextBox.Text)
@@ -200,16 +284,14 @@ BtnRunOnce.MouseButton1Click:Connect(function()
       BtnRunOnce.Text = "เกิดข้อผิดพลาด!"
    end
    task.wait(1)
-   BtnRunOnce.Text = "3. รันโค้ด 1 ครั้ง"
+   BtnRunOnce.Text = "3. รัน 1 ครั้ง"
 end)
 
--- 4. รันโค้ดรัวๆ (ความเร็ว 0.1 วิ)
 BtnRunAuto.MouseButton1Click:Connect(function()
    autoRunActive = not autoRunActive
    if autoRunActive then
-      BtnRunAuto.Text = "รัวๆ (0.1วิ): ON"
+      BtnRunAuto.Text = "รัวๆ: ON"
       BtnRunAuto.TextColor3 = Color3.fromRGB(0, 255, 100)
-      
       task.spawn(function()
          while autoRunActive do
             pcall(function()
@@ -220,12 +302,11 @@ BtnRunAuto.MouseButton1Click:Connect(function()
          end
       end)
    else
-      BtnRunAuto.Text = "4. รัวๆ (0.1วิ): OFF"
+      BtnRunAuto.Text = "4. รัวๆ(0.1s): OFF"
       BtnRunAuto.TextColor3 = Color3.fromRGB(0, 150, 255)
    end
 end)
 
--- 5. บันทึกโค้ด
 BtnSave.MouseButton1Click:Connect(function()
    savedCodeHistory = TextBox.Text
    BtnSave.Text = "บันทึกแล้ว!"
@@ -233,61 +314,50 @@ BtnSave.MouseButton1Click:Connect(function()
    BtnSave.Text = "5. บันทึกโค้ด"
 end)
 
--- 6 & 7. ประวัติบันทึก
-local function loadHistoryText()
+local function loadHistory()
    if savedCodeHistory ~= "" then
       TextBox.Text = savedCodeHistory
    end
 end
 
 BtnHistory1.MouseButton1Click:Connect(function()
-   loadHistoryText()
+   loadHistory()
    BtnHistory1.Text = "โหลดแล้ว!"
    task.wait(1)
    BtnHistory1.Text = "6. ประวัติบันทึก"
 end)
 
 BtnHistory2.MouseButton1Click:Connect(function()
-   loadHistoryText()
+   loadHistory()
    BtnHistory2.Text = "โหลดแล้ว!"
    task.wait(1)
-   BtnHistory2.Text = "7. ประวัติบันทึกโค้ด"
+   BtnHistory2.Text = "7. ประวัติสำรอง"
 end)
 
--- ตั้งค่าความเร็วตามที่พิมพ์ในช่อง
 BtnSpeed.MouseButton1Click:Connect(function()
-   local speedValue = tonumber(SpeedInput.Text)
-   if speedValue then
+   local val = tonumber(SpeedInput.Text)
+   if val then
       local char = LocalPlayer.Character
       if char and char:FindFirstChildOfClass("Humanoid") then
-         char:FindFirstChildOfClass("Humanoid").WalkSpeed = speedValue
+         char:FindFirstChildOfClass("Humanoid").WalkSpeed = val
          BtnSpeed.Text = "ตั้งค่าสำเร็จ!"
          task.wait(1)
          BtnSpeed.Text = "ตั้งค่าความเร็ว"
       end
-   else
-      BtnSpeed.Text = "กรุณาใส่ตัวเลข!"
-      task.wait(1)
-      BtnSpeed.Text = "ตั้งค่าความเร็ว"
    end
 end)
 
--- ตั้งค่าพลังกระโดดตามที่พิมพ์ในช่อง
 BtnJump.MouseButton1Click:Connect(function()
-   local jumpValue = tonumber(JumpInput.Text)
-   if jumpValue then
+   local val = tonumber(JumpInput.Text)
+   if val then
       local char = LocalPlayer.Character
       if char and char:FindFirstChildOfClass("Humanoid") then
-         local humanoid = char:FindFirstChildOfClass("Humanoid")
-         humanoid.UseJumpPower = true
-         humanoid.JumpPower = jumpValue
+         local hum = char:FindFirstChildOfClass("Humanoid")
+         hum.UseJumpPower = true
+         hum.JumpPower = val
          BtnJump.Text = "ตั้งค่าสำเร็จ!"
          task.wait(1)
          BtnJump.Text = "ตั้งค่ากระโดด"
       end
-   else
-      BtnJump.Text = "กรุณาใส่ตัวเลข!"
-      task.wait(1)
-      BtnJump.Text = "ตั้งค่ากระโดด"
    end
 end)
